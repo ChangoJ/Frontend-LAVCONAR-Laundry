@@ -1,5 +1,5 @@
 import { adminBranchOfficesApi } from "../api/admin-branch.api";
-import type { BranchOfficesResponse } from "../interfaces/get-branch-offices.interface";
+import type { BranchOfficesResponse } from "../interfaces/get-branch-offices.response";
 
 export const getBranchOfficesAction =
   async (): Promise<BranchOfficesResponse> => {
