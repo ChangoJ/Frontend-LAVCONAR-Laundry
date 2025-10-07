@@ -1,7 +1,4 @@
-import type {
-  BranchOffice,
-  BranchOfficeUser,
-} from "../interfaces/branch-office.interface";
+import type { BranchOffice, BranchOfficeUser } from "./branch-office.interface";
 
 export interface BranchOfficeResponse {
   success: boolean;

@@ -18,7 +18,9 @@ export interface CreateBranchOfficeData {
 }
 
 export interface UpdateBranchOfficeData
-  extends Partial<CreateBranchOfficeData> {}
+  extends Partial<CreateBranchOfficeData> {
+  status?: string;
+}
 
 export interface BranchOfficeUser {
   id: string;

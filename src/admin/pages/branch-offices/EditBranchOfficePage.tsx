@@ -12,6 +12,7 @@ import { Link } from "react-router";
 import { useBranchOfficeQuery } from "../../hook/branch-office/useBranchOfficeQuery";
 import { useUpdateBranchOfficeMutation } from "../../hook/branch-office/useUpdateBranchOfficeMutation";
 import type { UpdateBranchOfficeData } from "../../interfaces/branch-office/branch-office.interface";
+import { Select } from "@/components/ui/select";
 
 // Schema de validación con Zod
 const updateBranchOfficeSchema = z.object({
@@ -36,6 +37,12 @@ const updateBranchOfficeSchema = z.object({
     .optional()
     .refine((val) => !val || val.length <= 20, {
       message: "El teléfono no puede exceder 20 caracteres",
+    }),
+  status: z
+    .string()
+    .optional()
+    .refine((val) => !val || val.length <= 20, {
+      message: "El estado no puede exceder 20 caracteres",
     }),
 });
 
@@ -69,6 +76,7 @@ export const EditBranchOfficePage = () => {
       setValue("code", branchOffice.code || "");
       setValue("address", branchOffice.address || "");
       setValue("phone", branchOffice.phone || "");
+      setValue("status", branchOffice.status || "");
     }
   }, [branchOfficeData, setValue]);
 
@@ -80,6 +88,7 @@ export const EditBranchOfficePage = () => {
       code: data.code || undefined,
       address: data.address || undefined,
       phone: data.phone || undefined,
+      status: data.status || undefined,
     };
 
     updateMutation.mutate({ id, data: updateData });
@@ -196,6 +205,20 @@ export const EditBranchOfficePage = () => {
                 />
                 {errors.phone && (
                   <p className="text-sm text-red-500">{errors.phone.message}</p>
+                )}
+              </div>
+
+              {/* Estado */}
+              <div className="space-y-2">
+                <Label htmlFor="status">Estado</Label>
+                <Select {...register("status")}>
+                  <option value="ACTIVE">Activo</option>
+                  <option value="INACTIVE">Inactivo</option>
+                </Select>
+                {errors.status && (
+                  <p className="text-sm text-red-500">
+                    {errors.status.message}
+                  </p>
                 )}
               </div>
 
