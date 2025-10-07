@@ -11,6 +11,17 @@ const DashboardPage = lazy(
   () => import("@/admin/pages/dashboard/DashboardPage")
 );
 
+// Branch offices pages
+const BranchOfficesPage = lazy(
+  () => import("@/admin/pages/branch-offices/BranchOfficesPage")
+);
+const CreateBranchOfficePage = lazy(
+  () => import("@/admin/pages/branch-offices/CreateBranchOfficePage")
+);
+const EditBranchOfficePage = lazy(
+  () => import("@/admin/pages/branch-offices/EditBranchOfficePage")
+);
+
 export const appRouter = createBrowserRouter([
   // Ruta raíz - redirigir al dashboard si está autenticado, sino al login
   {
@@ -35,6 +46,31 @@ export const appRouter = createBrowserRouter([
         path: "dashboard",
         element: <DashboardPage />,
       },
+      // Rutas de sucursales - Solo SUPERADMIN
+      {
+        path: "branch-offices",
+        element: (
+          <ProtectedRoute requiredRole="SUPERADMIN">
+            <BranchOfficesPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "branch-offices/create",
+        element: (
+          <ProtectedRoute requiredRole="SUPERADMIN">
+            <CreateBranchOfficePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "branch-offices/:id/edit",
+        element: (
+          <ProtectedRoute requiredRole="SUPERADMIN">
+            <EditBranchOfficePage />
+          </ProtectedRoute>
+        ),
+      },
       // Aquí puedes agregar más rutas protegidas
       // {
       //   path: "clients",
@@ -43,14 +79,6 @@ export const appRouter = createBrowserRouter([
       // {
       //   path: "guides",
       //   element: <GuidesPage />,
-      // },
-      // {
-      //   path: "branches",
-      //   element: (
-      //     <ProtectedRoute requiredRole="SUPERADMIN">
-      //       <BranchesPage />
-      //     </ProtectedRoute>
-      //   ),
       // },
     ],
   },

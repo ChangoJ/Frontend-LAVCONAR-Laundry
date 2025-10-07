@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getBranchOfficesAction } from "../actions/get-branch-offices.action";
+import { getBranchOfficesAction } from "../../actions/branch-office/get-branch-offices.action";
 
 export const useBranchOffices = () => {
   return useQuery({

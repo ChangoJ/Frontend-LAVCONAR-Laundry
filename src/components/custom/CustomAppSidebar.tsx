@@ -45,11 +45,16 @@ export function AppSidebar() {
   const adminItems = [
     {
       title: "Sucursales",
-      url: "/admin/branches",
+      url: "/admin/branch-offices",
       icon: Building2,
       role: "SUPERADMIN",
     },
-    { title: "Auditoría", url: "/audit", icon: History, role: "SUPERADMIN" },
+    {
+      title: "Auditoría",
+      url: "/admin/audit",
+      icon: History,
+      role: "SUPERADMIN",
+    },
   ];
 
   return (
