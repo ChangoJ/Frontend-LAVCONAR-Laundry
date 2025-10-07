@@ -1,17 +1,13 @@
-import React, { createContext, useContext, useState } from "react";
-import { toast } from "sonner";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import type { User } from "@/auth/interfaces/login.response";
 
 interface AuthContextType {
-  user: any | null;
-  branch: any | null;
+  user: User | null;
   loading: boolean;
-  signIn: (
-    identifier: string,
-    password: string,
-    branchId: string
-  ) => Promise<void>;
-  signOut: () => Promise<void>;
+  isAuthenticated: boolean;
   hasRole: (role: string) => boolean;
+  initializeAuth: () => void;
+  clearAuth: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,27 +15,59 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<any | null>(null);
-  const [branch, setBranch] = useState<any | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const signIn = async (
-    username: string,
-    password: string,
-    branchId: string
-  ) => {};
+  // Función para inicializar la autenticación desde localStorage
+  const initializeAuth = () => {
+    try {
+      setLoading(true);
+      const storedUser = localStorage.getItem("user");
+      const accessToken = localStorage.getItem("accessToken");
 
-  const signOut = async () => {
-    toast.info("Sesión cerrada");
+      if (storedUser && accessToken) {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.error("Error initializing auth:", error);
+      clearAuth();
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const hasRole = (role: string) => {
-    return user?.roles.includes(role as any) || false;
+  // Función para limpiar la autenticación
+  const clearAuth = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
   };
+
+  // Inicializar auth al montar el componente
+  useEffect(() => {
+    initializeAuth();
+  }, []);
+
+  const hasRole = (role: string): boolean => {
+    return user?.roles?.includes(role) || false;
+  };
+
+  const isAuthenticated = !!user && !!localStorage.getItem("accessToken");
 
   return (
     <AuthContext.Provider
-      value={{ user, branch, loading, signIn, signOut, hasRole }}
+      value={{
+        user,
+        loading,
+        isAuthenticated,
+        hasRole,
+        initializeAuth,
+        clearAuth,
+      }}
     >
       {children}
     </AuthContext.Provider>

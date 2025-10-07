@@ -21,31 +21,31 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-import { NavLink, useNavigate } from "react-router";
+import { NavLink } from "react-router";
 import { Button } from "../ui/button";
 import { useAuth } from "@/context/AuthContext";
+import { useLogoutMutation } from "@/auth/hook/useLogoutMutation";
 
 export function AppSidebar() {
   const { state } = useSidebar();
-  const { user, branch, signOut, hasRole } = useAuth();
-  const navigate = useNavigate();
+  const { user, hasRole } = useAuth();
+  const logoutMutation = useLogoutMutation();
   const collapsed = state === "collapsed";
 
-  const handleLogout = async () => {
-    await signOut();
-    navigate("/login");
+  const handleLogout = () => {
+    logoutMutation.mutate();
   };
 
   const menuItems = [
-    { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-    { title: "Clientes", url: "/clients", icon: Users },
-    { title: "Guías", url: "/guides", icon: FileText },
+    { title: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboard },
+    { title: "Clientes", url: "/admin/clients", icon: Users },
+    { title: "Guías", url: "/admin/guides", icon: FileText },
   ];
 
   const adminItems = [
     {
       title: "Sucursales",
-      url: "/branches",
+      url: "/admin/branches",
       icon: Building2,
       role: "SUPERADMIN",
     },
@@ -65,7 +65,9 @@ export function AppSidebar() {
                 LAVCONAR
               </span>
               <span className="text-xs text-sidebar-foreground/60">
-                {branch?.name}
+                {user?.branch_office_id
+                  ? `Sucursal: ${user.branch_office_id}`
+                  : "Sistema de Lavandería"}
               </span>
             </div>
           )}
@@ -140,10 +142,15 @@ export function AppSidebar() {
             variant="ghost"
             size={collapsed ? "icon" : "default"}
             onClick={handleLogout}
-            className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
+            disabled={logoutMutation.isPending}
+            className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent disabled:opacity-50"
           >
             <LogOut className="h-4 w-4" />
-            {!collapsed && <span className="ml-2">Cerrar Sesión</span>}
+            {!collapsed && (
+              <span className="ml-2">
+                {logoutMutation.isPending ? "Cerrando..." : "Cerrar Sesión"}
+              </span>
+            )}
           </Button>
         </div>
       </SidebarFooter>

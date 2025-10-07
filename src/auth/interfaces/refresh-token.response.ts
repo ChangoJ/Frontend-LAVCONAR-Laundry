@@ -1,11 +1,11 @@
-export interface LoginResponse {
+export interface RefreshTokenResponse {
   status: number;
   message: string;
-  data: LoginData;
+  data: Data;
   timestamp: Date;
 }
 
-export interface LoginData {
+export interface Data {
   user: User;
   accessToken: string;
   refreshToken: string;
@@ -16,7 +16,4 @@ export interface User {
   id: string;
   username: string;
   email: string;
-  branch_office_id: string;
-  allowed_branches: any[];
-  roles: string[];
 }
