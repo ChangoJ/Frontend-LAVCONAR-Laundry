@@ -23,31 +23,17 @@ import { useAuth } from "@/context/AuthContext";
 import { useBrachOffices } from "@/admin/hook/useBranchOffices";
 
 export const LoginPage = () => {
-  const { data: branchOffices, isLoading, isError } = useBrachOffices();
+  const { data: branchOfficesData, isLoading, isError } = useBrachOffices();
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
-  const [branchId, setBranchId] = useState("");
-  const [branches, setBranches] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { signIn, user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!identifier || !password || !branchId) {
+    if (!identifier || !password || !branchOfficesData?.data) {
       return;
-    }
-
-    setLoading(true);
-    try {
-      await signIn(identifier, password, branchId);
-      navigate("/dashboard");
-    } catch (error) {
-      // Error handled in signIn
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -93,20 +79,16 @@ export const LoginPage = () => {
 
             <div className="space-y-2">
               <Label htmlFor="branch">Sucursal</Label>
-              <Select
-                value={branchId}
-                onValueChange={setBranchId}
-                disabled={isLoading || isError}
-              >
+              <Select disabled={isLoading || isError}>
                 <SelectTrigger id="branch">
                   <SelectValue
                     placeholder={
-                      branchOffices ? "Cargando..." : "Selecciona una sucursal"
+                      isError ? "Cargando..." : "Selecciona una sucursal"
                     }
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  {branches.map((branch) => (
+                  {branchOfficesData?.data?.map((branch) => (
                     <SelectItem key={branch.id} value={branch.id}>
                       {branch.name}
                     </SelectItem>
@@ -116,7 +98,7 @@ export const LoginPage = () => {
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {loading ? (
+              {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Iniciando sesión...
