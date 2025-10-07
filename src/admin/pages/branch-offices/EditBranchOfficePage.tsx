@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useParams } from "react-router";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ArrowLeft, Building2, Save } from "lucide-react";
@@ -12,7 +12,13 @@ import { Link } from "react-router";
 import { useBranchOfficeQuery } from "../../hook/branch-office/useBranchOfficeQuery";
 import { useUpdateBranchOfficeMutation } from "../../hook/branch-office/useUpdateBranchOfficeMutation";
 import type { UpdateBranchOfficeData } from "../../interfaces/branch-office/branch-office.interface";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectTrigger,
+  SelectValue,
+  SelectItem,
+} from "@/components/ui/select";
 
 // Schema de validación con Zod
 const updateBranchOfficeSchema = z.object({
@@ -41,8 +47,8 @@ const updateBranchOfficeSchema = z.object({
   status: z
     .string()
     .optional()
-    .refine((val) => !val || val.length <= 20, {
-      message: "El estado no puede exceder 20 caracteres",
+    .refine((val) => !val || val === "ACTIVE" || val === "INACTIVE", {
+      message: "El estado debe ser ACTIVE o INACTIVE",
     }),
 });
 
@@ -61,8 +67,8 @@ export const EditBranchOfficePage = () => {
     register,
     handleSubmit,
     formState: { errors, isValid },
-    reset,
     setValue,
+    control,
   } = useForm<UpdateBranchOfficeFormData>({
     resolver: zodResolver(updateBranchOfficeSchema),
     mode: "onChange",
@@ -76,7 +82,15 @@ export const EditBranchOfficePage = () => {
       setValue("code", branchOffice.code || "");
       setValue("address", branchOffice.address || "");
       setValue("phone", branchOffice.phone || "");
-      setValue("status", branchOffice.status || "");
+
+      // Validar y establecer el status
+      const status = branchOffice.status;
+      if (status === "ACTIVE" || status === "INACTIVE") {
+        setValue("status", status);
+      } else {
+        // Si el valor no es válido, establecer un valor por defecto
+        setValue("status", "ACTIVE");
+      }
     }
   }, [branchOfficeData, setValue]);
 
@@ -211,10 +225,29 @@ export const EditBranchOfficePage = () => {
               {/* Estado */}
               <div className="space-y-2">
                 <Label htmlFor="status">Estado</Label>
-                <Select {...register("status")}>
-                  <option value="ACTIVE">Activo</option>
-                  <option value="INACTIVE">Inactivo</option>
-                </Select>
+                <Controller
+                  name="status"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value || ""}
+                      onValueChange={(value) => {
+                        if (value === "ACTIVE" || value === "INACTIVE") {
+                          field.onChange(value);
+                        }
+                      }}
+                      disabled={isLoading || isError}
+                    >
+                      <SelectTrigger id="status">
+                        <SelectValue placeholder="Selecciona el estado" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ACTIVE">Activo</SelectItem>
+                        <SelectItem value="INACTIVE">Inactivo</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
                 {errors.status && (
                   <p className="text-sm text-red-500">
                     {errors.status.message}

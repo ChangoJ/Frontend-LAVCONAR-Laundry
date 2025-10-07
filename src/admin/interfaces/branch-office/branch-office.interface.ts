@@ -15,12 +15,11 @@ export interface CreateBranchOfficeData {
   code?: string;
   address?: string;
   phone?: string;
+  status?: string;
 }
 
 export interface UpdateBranchOfficeData
-  extends Partial<CreateBranchOfficeData> {
-  status?: string;
-}
+  extends Partial<CreateBranchOfficeData> {}
 
 export interface BranchOfficeUser {
   id: string;
